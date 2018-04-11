@@ -2,6 +2,7 @@
 # first_name VARCHAR(255),
 # last_name VARChAR(255)
 require('pg')
+require_relative('../db/sql_runner.rb')
 
 class Artist
 
@@ -15,12 +16,9 @@ class Artist
   end
 
   def save
-    db = PG.connect({ dbname: "music_collection", host: "localhost" })
     sql =  "INSERT INTO artists (first_name, last_name, album_id) VALUES ($1, $2, $3) RETURNING id;"
     values = [@first_name, @last_name, @album_id]
-    db.prepare("save", sql)
-    db.exec_prepared("save", values)
-    db.close
+    SqlRunner.run(sql, values)
   end
 
 end
