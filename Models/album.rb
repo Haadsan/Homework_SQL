@@ -3,6 +3,8 @@
 # artist_id INT REFERENCES artist(id)
 require('pg')
 require_relative('artist.rb')
+require_relative('album.rb')
+require_relative('../db/sql_runner.rb')
 class Album
 
   attr_reader :id
@@ -12,11 +14,15 @@ class Album
   end
 
    def save
-     db = PG.connect({ dbname: "music_collection", host: "localhost" })
      sql = "INSERT INTO albums (album_name) VALUES ($1) RETURNING id;"
      values = [@album_name]
-     db.prepare("save", sql)
-     result = db.exec_prepared("save", values)
+     result = SqlRunner.run(sql, values)
      @id = result[0]['id'].to_i
+   end
+
+   def self.all()
+     sql = "SELECT * FROM albums;"
+     result = SqlRunner.run(sql)
+     return result.map{|album| Album.new(album)}
    end
 end
